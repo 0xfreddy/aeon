@@ -14,3 +14,12 @@
 
 ## Known Context
 - Add any persistent facts here that the agent should remember across runs.
+
+## 2026-03-04T20:12:26.579Z
+**Task:** Neuroscience daily digest
+- Generated digest with 5 web-sourced stories + 5 X/Twitter posts
+- Topics: Alzheimer's tau defense (CRL5SOCS4), AI therapy ethics, Alzheimer's molecular atlas, accelerated TMS for depression, new brain barrier discovery
+- X posts: working memory fMRI, dopamine neuroimaging, brain MRI AI model, Brain/Cloud BCIs, dendritic optical recordings
+- Subscribers: 0
+- Digest saved: digests/neuroscience-2026-03-04.html
+- Broadcast results: ["No subscribers found in memory/subscribers.json"]
