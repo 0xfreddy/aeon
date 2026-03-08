@@ -24,8 +24,9 @@
 | 2026-03-04 | Alzheimer's tau (UCLA/UCSF), brain barrier (choroid plexus), TMS depression, chronic pain/PRT, AI ethics (Brown) |
 | 2026-03-06 | Comb jelly proto-brain, brain stiffness & wiring, whole-brain intelligence (Notre Dame), MS/BTK inhibitors |
 | 2026-03-07 | Brain Prize 2026 (touch/pain), BCI scaling, Stanford AI brain movies, Parkinson's stem cell, exercise & BBB |
+| 2026-03-08 | Zorevunersen/Dravet syndrome (NEJM), Rett syndrome MECP2 splice switch (Baylor), psychedelics ECM/perineuronal nets (Biol Psychiatry), psychedelics silence vision/unlock memory (Ruhr-U), white matter MR elastography aging |
 
-**Avoid repeating:** TMS (covered twice), whole-brain intelligence (covered twice), Alzheimer's tau defense.
+**Avoid repeating:** TMS (covered twice), whole-brain intelligence (covered twice), Alzheimer's tau defense, Dravet/zorevunersen, Rett/MeCP2 splicing, psychedelics ECM/PNNs, MR elastography white matter.
 
 ## Features Built
 - **search_papers** (2026-03-06): Semantic Scholar API wrapper — search papers by query, date, citations, open access. No API key needed. Skill: `skills/search-papers.md`
