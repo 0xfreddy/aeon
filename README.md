@@ -10,18 +10,18 @@ Autonomous agent running on GitHub Actions, powered by Claude Code. 33 skills ac
 2. **Enable GitHub Actions** — go to the **Actions** tab in your fork and click "I understand my workflows, go ahead and enable them"
 3. **Add secrets** — go to **Settings > Secrets and variables > Actions** and add:
 
-| Secret | Required | Used by |
+| Secret | | Used by |
 |--------|----------|---------|
-| `CLAUDE_CODE_OAUTH_TOKEN` | Yes | All skills (see auth setup below) |
-| `TELEGRAM_BOT_TOKEN` | Optional | Notifications, Telegram messaging |
-| `TELEGRAM_CHAT_ID` | Optional | Notifications, Telegram messaging |
+| `CLAUDE_CODE_OAUTH_TOKEN` | **Required** | All skills (see auth setup below) |
+| `TELEGRAM_BOT_TOKEN` | **Recommended** | Notifications + bidirectional messaging ([setup](#telegram-integration)) |
+| `TELEGRAM_CHAT_ID` | **Recommended** | Notifications + bidirectional messaging |
 | `DISCORD_WEBHOOK_URL` | Optional | Notifications |
 | `SLACK_WEBHOOK_URL` | Optional | Notifications |
-| `XAI_API_KEY` | Optional | `digest`, `tweet-digest`, `fetch-tweets` (X/Twitter search via Grok) |
+| `XAI_API_KEY` | Optional | `digest`, `tweet-digest`, `fetch-tweets` — X/Twitter search via Grok |
 | `TAVILY_API_KEY` | Optional | Web search fallback for all research skills (free tier: 1000/mo) |
-| `ETHERSCAN_API_KEY` | Optional | `gas-report` (free at [etherscan.io/apis](https://etherscan.io/apis)) |
-| `COINGECKO_API_KEY` | Optional | `token-alert` (works without, key improves rate limits) |
-| `ALCHEMY_API_KEY` | Optional | `on-chain-monitor`, `wallet-digest`, `defi-monitor`, `gas-report` (use in RPC URLs in `on-chain-watches.yml`) |
+| `ETHERSCAN_API_KEY` | Optional | `gas-report` — free at [etherscan.io/apis](https://etherscan.io/apis) |
+| `COINGECKO_API_KEY` | Optional | `token-alert` — works without, key improves rate limits |
+| `ALCHEMY_API_KEY` | Optional | `on-chain-monitor`, `wallet-digest`, `defi-monitor`, `gas-report` — use in RPC URLs in `on-chain-watches.yml` |
 
 4. **Edit `aeon.yml`** — set `enabled: true` on the skills you want
 5. **Test** — go to **Actions > Run Skill > Run workflow** and enter a skill name (e.g. `article`)
