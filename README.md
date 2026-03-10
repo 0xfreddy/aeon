@@ -1,16 +1,12 @@
-<p align="center">
-  <img src="aeon-banner.jpg" alt="Aeon Banner" width="100%" />
-</p>
-
-<p align="center">
-  <img src="aeon.jpg" alt="Aeon" width="120" />
-</p>
-
-# Aeon
+# <img src="aeon.jpg" alt="Aeon" width="32" /> Aeon
 
 Background intelligence that evolves with you.
 
 Autonomous agent running on GitHub Actions, powered by Claude Code. 33 skills across research, dev tooling, crypto monitoring, and productivity — all off by default, turn on what you need.
+
+<p align="center">
+  <img src="aeon-banner.jpg" alt="Aeon Banner" width="100%" />
+</p>
 
 ## Quick start
 
