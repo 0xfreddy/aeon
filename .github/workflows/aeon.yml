@@ -9,12 +9,22 @@ on:
         description: 'Skill to run (e.g. article, digest)'
         required: true
         type: string
+      model:
+        description: 'Model to use (default: claude-sonnet-4-6)'
+        required: false
+        type: string
+        default: 'claude-sonnet-4-6'
   workflow_call:
     inputs:
       skill:
         description: 'Skill to run'
         required: true
         type: string
+      model:
+        description: 'Model to use'
+        required: false
+        type: string
+        default: 'claude-sonnet-4-6'
   repository_dispatch:
     types: [telegram-message, discord-message, slack-message]
   issues:
@@ -26,7 +36,7 @@ permissions:
   issues: read
 
 concurrency:
-  group: aeon-main
+  group: aeon-${{ inputs.skill || 'main' }}
   cancel-in-progress: false
 
 jobs:
@@ -258,6 +268,7 @@ jobs:
           ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
         run: |
           TODAY=$(date -u +%Y-%m-%d)
+          MODEL="${{ inputs.model || 'claude-sonnet-4-6' }}"
           ALLOWED="Read,Write,Edit,Glob,Grep,WebFetch,WebSearch"
           ALLOWED="$ALLOWED,Bash(curl:*),Bash(gh:*),Bash(git:*),Bash(jq:*)"
           ALLOWED="$ALLOWED,Bash(bash notify.sh:*),Bash(./notify.sh:*)"
@@ -281,11 +292,11 @@ jobs:
             - For anything else, do your best and explain what you did.
 
             Always send your response back via notify.sh so the user sees it." \
-              --allowedTools "$ALLOWED"
+              --model "$MODEL" --allowedTools "$ALLOWED"
           else
             SKILL_NAME="${{ steps.skill.outputs.name }}"
             claude -p "Today is $TODAY. Read and execute the skill defined in skills/${SKILL_NAME}/SKILL.md" \
-              --allowedTools "$ALLOWED"
+              --model "$MODEL" --allowedTools "$ALLOWED"
           fi
 
       - name: Commit results
