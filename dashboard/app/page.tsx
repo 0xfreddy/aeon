@@ -192,6 +192,8 @@ export default function Dashboard() {
   // Auth
   const [authStatus, setAuthStatus] = useState<{ authenticated: boolean } | null>(null)
   const [authLoading, setAuthLoading] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [authKey, setAuthKey] = useState('')
 
   const flash = (msg: string) => {
     setToast(msg)
@@ -205,13 +207,19 @@ export default function Dashboard() {
     } catch { /* ignore */ }
   }
 
-  const setupAuth = async () => {
+  const setupAuth = async (key?: string) => {
     setAuthLoading(true)
     try {
-      const res = await fetch('/api/auth', { method: 'POST' })
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(key ? { key } : {}),
+      })
       if (res.ok) {
         flash('Auth token saved to GitHub')
         setAuthStatus({ authenticated: true })
+        setShowAuthModal(false)
+        setAuthKey('')
       } else {
         const data = await res.json()
         flash(data.error || 'Auth setup failed')
@@ -490,11 +498,10 @@ export default function Dashboard() {
           <div className="flex gap-2">
             {authStatus && !authStatus.authenticated && (
               <button
-                onClick={setupAuth}
-                disabled={authLoading}
-                className="bg-red-600/80 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                onClick={() => setShowAuthModal(true)}
+                className="bg-red-600/80 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg transition-colors"
               >
-                {authLoading ? 'Setting up...' : 'Authenticate'}
+                Authenticate
               </button>
             )}
             <button
@@ -895,6 +902,42 @@ export default function Dashboard() {
                 )}
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-sm mx-4 p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-medium text-sm">Authenticate</h2>
+              <button
+                onClick={() => { setShowAuthModal(false); setAuthKey('') }}
+                className="text-zinc-500 hover:text-zinc-300 text-lg leading-none"
+              >
+                &times;
+              </button>
+            </div>
+            <p className="text-zinc-500 text-xs mb-4">
+              Paste your Anthropic API key to enable skill runs on GitHub Actions.
+            </p>
+            <input
+              type="password"
+              value={authKey}
+              onChange={(e) => setAuthKey(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && authKey.trim() && setupAuth(authKey.trim())}
+              placeholder="sk-ant-..."
+              autoFocus
+              className="w-full bg-zinc-800 text-zinc-200 text-sm rounded-lg px-3 py-2 border border-zinc-700/50 outline-none placeholder:text-zinc-600 font-mono mb-4"
+            />
+            <button
+              onClick={() => setupAuth(authKey.trim())}
+              disabled={!authKey.trim() || authLoading}
+              className="w-full bg-green-600 hover:bg-green-500 text-white text-sm py-2.5 rounded-lg transition-colors disabled:opacity-50"
+            >
+              {authLoading ? 'Saving...' : 'Save to GitHub'}
+            </button>
           </div>
         </div>
       )}

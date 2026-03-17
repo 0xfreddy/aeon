@@ -28,32 +28,48 @@ export async function GET() {
   }
 }
 
-export async function POST() {
-  // Run claude setup-token, capture the token, save as GitHub secret
+export async function POST(request: Request) {
+  // Accept a manually provided API key or OAuth token
   try {
     if (!ghAvailable()) {
       return NextResponse.json({ error: 'gh CLI not authenticated. Run: gh auth login' }, { status: 503 })
     }
 
-    // claude setup-token outputs the token to stdout
-    const token = execSync('claude setup-token', {
-      stdio: 'pipe',
-      timeout: 60000,
-    }).toString().trim()
+    const body = await request.json().catch(() => ({})) as { key?: string }
 
-    if (!token) {
-      return NextResponse.json({ error: 'No token returned from claude setup-token' }, { status: 500 })
+    if (body.key) {
+      // User pasted an API key — save as ANTHROPIC_API_KEY
+      execSync('gh secret set ANTHROPIC_API_KEY', {
+        input: body.key.trim(),
+        stdio: ['pipe', 'pipe', 'pipe'],
+      })
+      return NextResponse.json({ ok: true, method: 'api-key' })
     }
 
-    // Save as CLAUDE_CODE_OAUTH_TOKEN GitHub secret
-    execSync(`gh secret set CLAUDE_CODE_OAUTH_TOKEN`, {
+    // No key provided — try claude setup-token and extract the sk-ant-oat token
+    const output = execSync('claude setup-token', {
+      stdio: 'pipe',
+      timeout: 60000,
+    }).toString()
+
+    // The token starts with sk-ant-oat and may wrap across multiple lines
+    const match = output.match(/sk-ant-oat[A-Za-z0-9_\-]+/g)
+    if (!match) {
+      return NextResponse.json({
+        error: 'Could not extract token. Paste your API key manually instead.',
+      }, { status: 400 })
+    }
+    // Join in case the token wrapped across lines (strip whitespace between fragments)
+    const token = match.join('')
+
+    execSync('gh secret set CLAUDE_CODE_OAUTH_TOKEN', {
       input: token,
       stdio: ['pipe', 'pipe', 'pipe'],
     })
 
-    return NextResponse.json({ ok: true })
+    return NextResponse.json({ ok: true, method: 'oauth' })
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : 'Failed to setup token'
+    const msg = error instanceof Error ? error.message : 'Failed to setup auth'
     return NextResponse.json({ error: msg }, { status: 500 })
   }
 }
