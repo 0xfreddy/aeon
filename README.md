@@ -363,6 +363,33 @@ Same code, different host. Deploy the webhook handler above as a serverless func
 
 Add the label `ai-build` to any GitHub issue. The workflow fires automatically and Claude will read the issue, implement it, and open a PR.
 
+## Installing external skills
+
+Use `./add-skill` to import skills from any GitHub repo that follows the [Agent Skills](https://github.com/vercel-labs/skills) format:
+
+```bash
+# List available skills in a repo
+./add-skill BankrBot/skills --list
+
+# Install specific skills
+./add-skill BankrBot/skills bankr hydrex veil
+
+# Install everything from a repo
+./add-skill BankrBot/skills --all
+
+# Use a specific branch
+./add-skill BankrBot/skills bankr --branch develop
+```
+
+Installed skills are copied into `skills/` and auto-registered in `aeon.yml` (disabled by default). Enable them by setting `enabled: true` in `aeon.yml`, or run them on-demand via Telegram or `workflow_dispatch`.
+
+The built-in `search-skill` skill can also discover skills programmatically:
+
+```bash
+npx skills find "crypto trading"
+npx skills add vercel-labs/agent-skills --list
+```
+
 ## Adding a new skill
 
 1. Create `skills/your-skill/SKILL.md` with instructions for Claude:
