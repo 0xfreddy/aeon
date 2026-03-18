@@ -37,9 +37,16 @@ cd aeon && ./aeon
 
 That's it — the dashboard opens in your browser. From there:
 
-1. **Authenticate** — add your Claude API key or OAuth token and any messaging secrets (Telegram, Discord, Slack)
-2. **Pick skills** — toggle on what you want, set a schedule or leave as on-demand
-3. **Push** — one click commits and pushes your config to GitHub, Actions takes it from there
+1. **Authenticate** — add your Claude API key or OAuth token
+2. **Add a channel** — set up [Telegram, Discord, or Slack](#notifications) so Aeon can talk to you (and you can talk back)
+3. **Pick skills** — toggle on what you want, set a schedule, and optionally set a `var` to focus each skill
+4. **Push** — one click commits and pushes your config to GitHub, Actions takes it from there
+
+You can also schedule and trigger skills by messaging Aeon directly on Telegram — just tell it what you want.
+
+<p align="center">
+  <img src="tg.png" alt="Telegram" width="400" />
+</p>
 
 ---
 
@@ -139,13 +146,37 @@ skills:
     enabled: true               # flip to activate
     schedule: "0 8 * * *"       # daily at 8am UTC
   digest:
-    enabled: false
+    enabled: true
     schedule: "0 14 * * *"
+    var: "solana"               # topic for this skill
 ```
 
 Standard cron format. All times UTC. Supports `*`, `*/N`, exact values, comma lists.
 
 **Order matters** — the scheduler picks the first matching skill. Put day-specific skills (e.g. Monday-only) before daily ones. Heartbeat goes last.
+
+### The `var` field
+
+Every skill accepts a single `var` — a universal input that each skill interprets in its own way:
+
+| Skill type | What `var` does | Example |
+|-----------|----------------|---------|
+| Research & content | Sets the topic | `var: "rust"` → digest about Rust |
+| Dev & code | Narrows to a repo | `var: "owner/repo"` → only review that repo's PRs |
+| Crypto | Focuses on a token/wallet | `var: "solana"` → only check SOL price |
+| Productivity | Sets the focus area | `var: "shipping v2"` → morning brief emphasizes v2 |
+
+If `var` is empty, each skill falls back to its default behavior (scan everything, auto-pick topics, etc.). Set it from the dashboard or pass it when triggering manually.
+
+### Model selection
+
+The default model for all skills is set in `aeon.yml`:
+
+```yaml
+model: claude-opus-4-6
+```
+
+You can change it from the dashboard header dropdown. Options: `claude-opus-4-6`, `claude-sonnet-4-6`, `claude-haiku-4-5-20251001`. Per-run overrides are also available via workflow dispatch.
 
 ### Changing check frequency
 
