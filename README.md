@@ -390,3 +390,7 @@ GitHub has two requirements for scheduled workflows:
 2. The repo must have **recent activity** — GitHub disables crons on repos with no commits in 60 days. New template forks need one manual trigger to activate.
 
 **Fix:** Actions → Messages → Run workflow (manual trigger). After that, the cron activates automatically.
+
+---
+
+Support the project : 0xbf8e8f0e8866a7052f948c16508644347c57aba3
