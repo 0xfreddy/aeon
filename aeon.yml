@@ -45,6 +45,7 @@ skills:
   idea-capture: { enabled: false, schedule: "0 14 * * *" }
 
   # --- Late afternoon (4 PM UTC) ---
+  skill-security-scan: { enabled: false, schedule: "0 16 * * 1" }
   code-health: { enabled: false, schedule: "0 16 * * *" }
   changelog: { enabled: false, schedule: "0 16 * * *" }
   feature: { enabled: false, schedule: "0 16 * * *" }
