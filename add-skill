@@ -33,6 +33,7 @@ Options:
   --list              List available skills in the repo
   --all               Install all skills from the repo
   --branch <branch>   Use a specific branch (default: main)
+  --force             Install even if security scan finds issues
   --help              Show this help
 
 Examples:
@@ -63,6 +64,7 @@ while [[ $# -gt 0 ]]; do
     --list) LIST_ONLY=true; shift ;;
     --all) INSTALL_ALL=true; shift ;;
     --branch) BRANCH="$2"; shift 2 ;;
+    --force) SKILL_NAMES+=("--force"); shift ;;
     --help|-h) usage ;;
     -*) echo "Unknown option: $1" >&2; exit 1 ;;
     *) SKILL_NAMES+=("$1"); shift ;;
@@ -150,18 +152,72 @@ if [[ ${#SKILL_NAMES[@]} -eq 0 ]]; then
   exit 1
 fi
 
+# Security scanning
+SCANNER="$(cd "$(dirname "$0")" && pwd)/skills/skill-security-scan/scan.sh"
+TRUSTED_FILE="$(cd "$(dirname "$0")" && pwd)/skills/security/trusted-sources.txt"
+FORCE_INSTALL=false
+
+# Check for --force flag (already parsed, but check env)
+for arg in "${SKILL_NAMES[@]}"; do
+  if [[ "$arg" == "--force" ]]; then
+    FORCE_INSTALL=true
+  fi
+done
+
+# Check if source repo is trusted
+is_trusted() {
+  local repo="$1"
+  local owner="${repo%%/*}"
+  if [[ -f "$TRUSTED_FILE" ]]; then
+    while IFS= read -r line; do
+      line="${line%%#*}"
+      line="${line// /}"
+      [[ -z "$line" ]] && continue
+      if [[ "$line" == "$repo" ]] || [[ "$line" == "$owner" ]]; then
+        return 0
+      fi
+    done < "$TRUSTED_FILE"
+  fi
+  return 1
+}
+
+TRUSTED_SOURCE=false
+if is_trusted "$REPO"; then
+  TRUSTED_SOURCE=true
+  echo "Source $REPO is trusted — skipping deep security scan."
+fi
+
 # Install each skill
 INSTALLED=0
 SKIPPED=0
 FAILED=0
 
 for skill in "${SKILL_NAMES[@]}"; do
+  [[ "$skill" == "--force" ]] && continue
+
   src="$REPO_DIR/$skill"
 
   if [[ ! -d "$src" ]] || [[ ! -f "$src/SKILL.md" ]]; then
     echo "  skip: '$skill' not found in repo"
     FAILED=$((FAILED + 1))
     continue
+  fi
+
+  # Run security scan on untrusted sources
+  if [[ "$TRUSTED_SOURCE" == "false" ]] && [[ -x "$SCANNER" ]]; then
+    echo "  scanning: $skill ..."
+    if ! "$SCANNER" "$src/SKILL.md" 2>/dev/null; then
+      if [[ "$FORCE_INSTALL" == "true" ]]; then
+        echo "  ⚠ SECURITY ISSUES DETECTED — installing anyway (--force)"
+        echo "  $(date -u '+%Y-%m-%dT%H:%M:%SZ') FORCE_INSTALL: $skill from $REPO" >> "$(cd "$(dirname "$0")" && pwd)/memory/logs/security.log"
+      else
+        echo "  ✗ BLOCKED: $skill has security issues. Use --force to override."
+        FAILED=$((FAILED + 1))
+        continue
+      fi
+    else
+      echo "  ✓ security scan passed"
+    fi
   fi
 
   dest="$SKILLS_DIR/$skill"

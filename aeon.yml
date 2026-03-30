@@ -45,6 +45,7 @@ skills:
   idea-capture: { enabled: false, schedule: "0 14 * * *" }
 
   # --- Late afternoon (4 PM UTC) ---
+  skill-security-scan: { enabled: false, schedule: "0 16 * * 1" }
   code-health: { enabled: false, schedule: "0 16 * * *" }
   changelog: { enabled: false, schedule: "0 16 * * *" }
   feature: { enabled: false, schedule: "0 16 * * *" }
@@ -56,6 +57,9 @@ skills:
   list-digest: { enabled: false, schedule: "0 17 * * *" }
   write-tweet: { enabled: false, schedule: "0 17 * * *" }
   reply-maker: { enabled: false, schedule: "0 17 * * *" }
+
+  # --- Feed generation (5:30 PM UTC, after content skills) ---
+  rss-feed: { enabled: false, schedule: "30 17 * * *" }
 
   # --- Evening / meta (6 PM UTC) ---
   goal-tracker: { enabled: false, schedule: "0 18 * * *" }
