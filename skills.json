@@ -1,8 +1,8 @@
 {
   "version": "1.0",
-  "generated": "2026-03-28T00:00:00Z",
+  "generated": "2026-04-04T00:00:00Z",
   "repo": "aaronjmars/aeon",
-  "total": 51,
+  "total": 52,
   "categories": {
     "research": "Research & Content",
     "dev": "Dev & Code",
@@ -110,6 +110,16 @@
       "var": "",
       "files": 0,
       "install": "./add-skill aaronjmars/aeon research-brief"
+    },
+    {
+      "slug": "deep-research",
+      "name": "Deep Research",
+      "description": "Exhaustive multi-source synthesis on any topic — 30-50 sources, 3000-5000 word analyst-grade report",
+      "category": "research",
+      "schedule": "on-demand",
+      "var": "",
+      "files": 1,
+      "install": "./add-skill aaronjmars/aeon deep-research"
     },
     {
       "slug": "fetch-tweets",
