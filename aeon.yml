@@ -59,6 +59,7 @@ skills:
   feature: { enabled: false, schedule: "0 16 * * *" }
   build-skill: { enabled: false, schedule: "0 16 * * *" }
   autoresearch: { enabled: false, schedule: "workflow_dispatch", var: "" } # on-demand — set var to skill name to evolve
+  create-skill: { enabled: false, schedule: "workflow_dispatch", var: "" } # one-shot skill creator — set var to a description prompt
 
   # --- X / social (5 PM UTC) ---
   fetch-tweets: { enabled: false, schedule: "0 17 * * *" }
