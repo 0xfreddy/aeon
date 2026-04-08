@@ -13,38 +13,43 @@ Read memory/MEMORY.md for tracked research topics and interests.
 Read the last 7 days of memory/logs/ to avoid covering papers already reported.
 
 For each topic area in MEMORY.md:
-1. Search Semantic Scholar API (free, no key needed):
+1. Search Hugging Face Papers API (free, no key needed, arXiv-indexed papers with community signal):
    ```bash
-   curl -s "https://api.semanticscholar.org/graph/v1/paper/search?query=TOPIC&year=YEAR&limit=10&fields=title,authors,abstract,url,publicationDate,citationCount,openAccessPdf" \
-     -H "Accept: application/json"
+   curl -s "https://huggingface.co/api/papers/search?q=TOPIC&limit=10"
    ```
-   If rate-limited (429), wait 3 seconds and retry once.
+   Response is a JSON array. Each entry has:
+   - `paper.id` — arXiv ID (use for links: `https://arxiv.org/abs/{id}`, PDF: `https://arxiv.org/pdf/{id}`)
+   - `paper.title`, `paper.summary` (abstract), `paper.authors[].name`
+   - `paper.publishedAt` — publication date
+   - `paper.upvotes` — community upvotes (higher = more notable)
 
-2. Also check arXiv for the latest preprints:
+2. Also check today's trending papers for serendipitous finds:
    ```bash
-   curl -s "http://export.arxiv.org/api/query?search_query=all:TOPIC&sortBy=submittedDate&sortOrder=descending&max_results=10"
+   curl -s "https://huggingface.co/api/daily_papers?limit=15"
    ```
+   Daily papers also include `paper.ai_summary` and `paper.ai_keywords[]` — use these to quickly assess relevance to tracked topics.
 
 3. Score each paper for relevance:
    - Direct keyword match to MEMORY.md interests = high
    - Related field or methodology = medium
+   - High upvotes (>10) on Hugging Face = boost score
    - Tangential = skip
 
 Select the top 5 most relevant papers across all topics.
 
 For each selected paper:
-- Fetch the abstract (from API response or via WebFetch if needed)
+- Use the abstract from the API response (`paper.summary`)
 - Write a 2-3 sentence summary: what they found, why it matters, connection to other work
-- Note if open-access PDF is available
+- Note upvote count as a signal of community interest
 
 Format as a weekly briefing and save to articles/paper-digest-${today}.md:
 ```markdown
 # Paper Digest — ${today}
 
 ## Topic Area
-1. **Paper Title** — Authors (Year)
+1. **Paper Title** — Authors (Year) · ↑upvotes
    Summary of key findings and implications.
-   [Link](url) | [PDF](pdf_url)
+   [Paper](https://arxiv.org/abs/ID) | [PDF](https://arxiv.org/pdf/ID)
 
 2. ...
 ```
