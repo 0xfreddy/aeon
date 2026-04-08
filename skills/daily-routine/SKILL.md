@@ -2,25 +2,24 @@
 name: Daily Routine
 description: Morning briefing combining token movers, tweet roundup, paper pick, GitHub issues, and HN digest
 var: ""
-depends_on: [token-movers, paper-pick, github-issues, hn-digest]
 tags: [news]
 ---
 > **${var}** — Area to emphasize (e.g. "crypto", "AI", "security"). If empty, covers all areas equally.
 
+This skill is designed to run as part of a chain (see `chains:` in `aeon.yml`). When chained, prior step outputs (token-movers, paper-pick, github-issues, hn-digest) are provided in the chain context above. Use those outputs directly — do not re-run the sub-skills.
+
+If running standalone (no chain context provided), fall back to reading each sub-skill and executing it inline:
+- Read `skills/token-movers/SKILL.md` and execute its steps
+- Read `skills/paper-pick/SKILL.md` and execute its steps
+- Read `skills/github-issues/SKILL.md` and execute its steps
+- Read `skills/hn-digest/SKILL.md` and execute its steps
+
 Read memory/MEMORY.md for context.
 Read the last 2 days of memory/logs/ to avoid repeating items.
 
-Run all five sections below by executing the corresponding skill. If `${var}` is set, pass it through to each skill. Combine the results into a single notification at the end.
-
 ---
 
-## 1. Token Movers
-
-Read `skills/token-movers/SKILL.md` and execute its steps. Capture the top 10 winners and losers.
-
----
-
-## 2. Tweet Roundup
+## Tweet Roundup
 
 Search X for the latest chatter across topics relevant to your interests. Use the X.AI API if `XAI_API_KEY` is set:
 
@@ -47,29 +46,9 @@ For each topic, write 2-3 bullet points capturing the gist. Include links.
 
 ---
 
-## 3. Paper Pick
-
-Read `skills/paper-pick/SKILL.md` and execute its steps. Capture the single best paper.
-
-Note: paper-pick requires `var` to be set with research topics. If the daily-routine `${var}` maps to research topics, pass it through. Otherwise, check if paper-pick has a default `var` configured in aeon.yml and use that.
-
----
-
-## 4. GitHub Issues
-
-Read `skills/github-issues/SKILL.md` and execute its steps. Report any new issues from the last 24 hours.
-
----
-
-## 5. HN Digest
-
-Read `skills/hn-digest/SKILL.md` and execute its steps. Capture the top 5-7 stories.
-
----
-
 ## Format & Send
 
-Combine everything into a single notification via `./notify` (keep under 4000 chars):
+Combine everything (chain context outputs + tweet roundup) into a single notification via `./notify` (keep under 4000 chars):
 
 ```
 *Daily Routine — ${today}*

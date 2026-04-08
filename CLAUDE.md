@@ -27,17 +27,30 @@ When consolidating memory (reflect, memory-flush), move detail into topic files 
 
   When running `./aeon` locally, use the json-render MCP tool to emit a rendered spec at the end of each skill run. The spec lands in `dashboard/outputs/` and the dashboard feed renders it in real time. This mode only activates locally — the GitHub Actions path uses `./notify-jsonrender` instead.
 
-## Composing Skills
+## Skill Chaining
 
-A skill can reuse another skill by reading its file and following its steps. For example, `morning-brief` can incorporate `rss-digest` and `hacker-news-digest` results in a single run:
+Skills can be chained together using the `chains:` section in `aeon.yml`. Chains run skills as separate workflow steps with outputs passed between them.
 
+### How chains work
+1. Each step runs as a separate GitHub Actions workflow (via `chain-runner.yml`)
+2. After each skill completes, its output is saved to `.outputs/{skill}.md`
+3. Downstream steps with `consume:` get prior outputs injected into context
+4. Steps can run in parallel or sequentially
+
+### Chain definition format
+```yaml
+chains:
+  my-chain:
+    schedule: "0 7 * * *"
+    on_error: fail-fast    # or: continue
+    steps:
+      - parallel: [skill-a, skill-b]     # run concurrently
+      - skill: skill-c                    # run after parallel group
+        consume: [skill-a, skill-b]       # inject their outputs
 ```
-Read skills/rss-digest/SKILL.md and execute its steps to get today's feed highlights.
-Read skills/hacker-news-digest/SKILL.md and execute its steps to get top stories.
-Combine the results into one briefing.
-```
 
-This works because skills are just markdown instructions — there's no API boundary. Use this for aggregation skills that synthesize outputs from multiple sources.
+### Standalone composition (legacy)
+A skill can still inline-execute another skill by reading its SKILL.md. Prefer chains when you need parallelism, output passing, or error handling.
 
 ## Notifications
 

@@ -91,6 +91,26 @@ skills:
   # --- Fallback (must be last) ---
   heartbeat: { enabled: true, schedule: "0 8,14,20 * * *" }
 
+# Chains — multi-step skill pipelines with parallel execution and output passing.
+# Steps run sequentially; use parallel: [...] for concurrent execution within a step.
+# Skills with consume: [...] receive prior step outputs injected into their context.
+#
+# Format:
+#   chains:
+#     chain-name:
+#       schedule: "cron expression"
+#       on_error: fail-fast          # fail-fast (default) | continue
+#       steps:
+#         - parallel: [skill-a, skill-b]
+#         - skill: skill-c, consume: [skill-a, skill-b]
+chains:
+  # daily-routine:
+  #   schedule: "0 7 * * *"
+  #   on_error: fail-fast
+  #   steps:
+  #     - parallel: [token-movers, paper-pick, github-issues, hn-digest]
+  #     - skill: daily-routine, consume: [token-movers, paper-pick, github-issues, hn-digest]
+
 # Default model for all skills. Override per-run via workflow_dispatch.
 # Options: claude-opus-4-6, claude-sonnet-4-6, claude-haiku-4-5-20251001
 model: claude-opus-4-6

@@ -22,6 +22,10 @@ on:
         description: 'Variable (e.g. AI, bitcoin, owner/repo)'
         required: false
         type: string
+      chain_context_file:
+        description: 'Path to file with prior chain step outputs (set by chain runner)'
+        required: false
+        type: string
   workflow_call:
     inputs:
       skill:
@@ -30,6 +34,14 @@ on:
         type: string
       model:
         description: 'Model override'
+        required: false
+        type: string
+      var:
+        description: 'Variable'
+        required: false
+        type: string
+      chain_context_file:
+        description: 'Chain context file path'
         required: false
         type: string
   issues:
@@ -233,7 +245,21 @@ jobs:
 
           SKILL_NAME="${{ steps.skill.outputs.name }}"
           VAR="$SKILL_VAR"
-          PROMPT="Today is $TODAY. Read and execute the skill defined in skills/${SKILL_NAME}/SKILL.md"
+
+          # Build prompt — inject chain context if running as part of a chain
+          CHAIN_CTX="${{ inputs.chain_context_file }}"
+          if [ -n "$CHAIN_CTX" ] && [ -f "$CHAIN_CTX" ]; then
+            CONTEXT=$(cat "$CHAIN_CTX")
+            PROMPT="Today is $TODAY.
+
+          ## Context from prior chain steps
+          $CONTEXT
+
+          Read and execute the skill defined in skills/${SKILL_NAME}/SKILL.md
+          Use the chain context above instead of re-running those skills. Synthesize and build on their outputs."
+          else
+            PROMPT="Today is $TODAY. Read and execute the skill defined in skills/${SKILL_NAME}/SKILL.md"
+          fi
           if [ -n "$VAR" ]; then
             PROMPT="$PROMPT
 
@@ -248,7 +274,10 @@ jobs:
           fi
 
           # Extract and print the text result so logs still show skill output
-          echo "$CLAUDE_OUTPUT" | jq -r '.result // empty'
+          RESULT_TEXT=$(echo "$CLAUDE_OUTPUT" | jq -r '.result // empty')
+          echo "$RESULT_TEXT"
+          # Save result for output capture step
+          echo "$RESULT_TEXT" > /tmp/skill-result.txt
 
           # Parse token usage from JSON response
           INPUT_TOKENS=$(echo "$CLAUDE_OUTPUT" | jq '.usage.input_tokens // 0')
@@ -292,6 +321,22 @@ jobs:
             echo "date,skill,model,input_tokens,output_tokens,cache_read,cache_creation" > "$CSV"
           fi
           echo "$(date -u +%Y-%m-%d),${{ steps.skill.outputs.name }},${{ steps.run.outputs.SKILL_MODEL }},${{ steps.run.outputs.SKILL_INPUT_TOKENS }},${{ steps.run.outputs.SKILL_OUTPUT_TOKENS }},${{ steps.run.outputs.SKILL_CACHE_READ_TOKENS }},${{ steps.run.outputs.SKILL_CACHE_CREATION_TOKENS }}" >> "$CSV"
+
+      - name: Capture skill output
+        if: steps.work.outputs.mode != '' && steps.run.outcome == 'success'
+        run: |
+          SKILL="${{ steps.skill.outputs.name }}"
+          mkdir -p .outputs
+          # Save the notification message as a chain artifact
+          PENDING="dashboard/outputs/.pending-${SKILL}.md"
+          if [ -f "$PENDING" ]; then
+            cp "$PENDING" ".outputs/${SKILL}.md"
+          elif [ -f /tmp/skill-result.txt ] && [ -s /tmp/skill-result.txt ]; then
+            cp /tmp/skill-result.txt ".outputs/${SKILL}.md"
+          else
+            echo "_No output captured._" > ".outputs/${SKILL}.md"
+          fi
+          echo "::notice::Skill output captured to .outputs/${SKILL}.md ($(wc -c < ".outputs/${SKILL}.md") bytes)"
 
       - name: Convert feed outputs
         if: steps.work.outputs.mode != '' && vars.JSONRENDER_ENABLED != 'false'
@@ -349,7 +394,7 @@ jobs:
                 CONFLICTED=$(git diff --name-only --diff-filter=U) || true
                 [ -z "$CONFLICTED" ] && break
                 for f in $CONFLICTED; do
-                  if [[ "$f" == memory/logs/* ]] || [[ "$f" == memory/topics/* ]] || [[ "$f" == memory/MEMORY.md ]] || [[ "$f" == dashboard/outputs/* ]]; then
+                  if [[ "$f" == memory/logs/* ]] || [[ "$f" == memory/topics/* ]] || [[ "$f" == memory/MEMORY.md ]] || [[ "$f" == dashboard/outputs/* ]] || [[ "$f" == .outputs/* ]]; then
                     sed -i '/^<<<<<<< /d; /^=======/d; /^>>>>>>> /d' "$f"
                     git add "$f"
                   else
