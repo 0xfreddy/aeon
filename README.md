@@ -36,7 +36,7 @@ The key difference: **other agents are interactive tools you use. Aeon is an aut
 
 This isn't better for everything — you still want Claude Code for writing code interactively. But for the 90% of recurring tasks that don't need you in the loop, the most autonomous agent is the one that never asks.
 
-![OpenClaw vs Aeon](./assets/openclaw.jpg)
+![Autonomy spectrum](./assets/autonomy.jpg)
 
 ---
 
@@ -137,6 +137,8 @@ Every skill output is automatically scored 1–5 by Haiku after each run (failed
 **Heartbeat** is the only skill enabled by default. Runs 3x daily, checks `memory/cron-state.json` for failed, stuck, or chronically broken skills, stalled PRs, and missed schedules. Nothing to report → logs `HEARTBEAT_OK`. Something needs attention → sends one notification. Listed last in `aeon.yml` so it only fires when no other skill claims the slot.
 
 ### Self-healing loop
+
+![Self-healing architecture](./assets/architecture.jpg)
 
 1. **`heartbeat`** (3x daily) — detects failed, stuck, or chronically broken skills
 2. **`skill-health`** — audits quality scores and flags API degradation patterns
@@ -381,6 +383,8 @@ Every skill reads `CLAUDE.md`, so identity propagates automatically.
 ---
 
 ## Project structure
+
+![The Stack](./assets/stack.jpg)
 
 ```
 CLAUDE.md                ← agent identity (auto-loaded by Claude Code)
