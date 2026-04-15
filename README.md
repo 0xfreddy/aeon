@@ -56,6 +56,23 @@ Click on `http://localhost:5555` to open the dashboard in your browser. From the
 
 ---
 
+## Skills
+
+![Skills](./assets/skill.jpg)
+
+| Category | Skills |
+|----------|--------|
+| **Research & Content** (17) | `article`, `digest`, `rss-digest`, `hacker-news-digest`, `paper-digest`, `paper-pick`, `last30`, `deep-research`, `technical-explainer`, `list-digest`, `research-brief`, `fetch-tweets`, `reddit-digest`, `telegram-digest`, `security-digest`, `channel-recap`, `vibecoding-digest` |
+| **Dev & Code** (28) | `pr-review`, `github-monitor`, `github-issues`, `github-releases`, `issue-triage`, `auto-merge`, `changelog`, `code-health`, `skill-security-scan`, `github-trending`, `push-recap`, `repo-pulse`, `repo-article`, `repo-actions`, `repo-scanner`, `project-lens`, `external-feature`, `create-skill`, `autoresearch`, `search-skill`, `auto-workflow`, `deploy-prototype`, `vuln-scanner`, `workflow-security-audit`, `vercel-projects`, `spawn-instance`, `fleet-control`, `fork-fleet` |
+| **Crypto & Markets** (16) | `token-alert`, `token-movers`, `token-report`, `token-pick`, `monitor-runners`, `on-chain-monitor`, `defi-monitor`, `defi-overview`, `market-context-refresh`, `narrative-tracker`, `monitor-polymarket`, `monitor-kalshi`, `polymarket-comments`, `unlock-monitor`, `treasury-info`, `distribute-tokens` |
+| **Social & Writing** (7) | `write-tweet`, `reply-maker`, `remix-tweets`, `refresh-x`, `tweet-roundup`, `agent-buzz`, `farcaster-digest` |
+| **Productivity** (12) | `morning-brief`, `daily-routine`, `evening-recap`, `weekly-review`, `weekly-shiplog`, `goal-tracker`, `idea-capture`, `action-converter`, `tool-builder`, `startup-idea`, `deal-flow`, `reg-monitor` |
+| **Meta / Agent** (11) | `heartbeat`, `reflect`, `self-improve`, `skill-health`, `skill-evals`, `skill-repair`, `skill-leaderboard`, `skill-update-check`, `cost-report`, `rss-feed`, `update-gallery` |
+
+Full descriptions: [`skills.json`](skills.json) — or run `./add-skill aaronjmars/aeon --list`
+
+---
+
 ## Authentication
 
 Set **one** of these — not both:
@@ -77,23 +94,6 @@ Route requests through [Bankr LLM Gateway](https://docs.bankr.bot/llm-gateway/ov
 1. Get a key at [bankr.bot/api](https://bankr.bot/api) and top up credits
 2. Add `BANKR_LLM_KEY` as a repo secret
 3. Set `gateway: { provider: bankr }` in `aeon.yml`
-
----
-
-## Skills
-
-![Skills](./assets/skill.jpg)
-
-| Category | Skills |
-|----------|--------|
-| **Research & Content** (17) | `article`, `digest`, `rss-digest`, `hacker-news-digest`, `paper-digest`, `paper-pick`, `last30`, `deep-research`, `technical-explainer`, `list-digest`, `research-brief`, `fetch-tweets`, `reddit-digest`, `telegram-digest`, `security-digest`, `channel-recap`, `vibecoding-digest` |
-| **Dev & Code** (28) | `pr-review`, `github-monitor`, `github-issues`, `github-releases`, `issue-triage`, `auto-merge`, `changelog`, `code-health`, `skill-security-scan`, `github-trending`, `push-recap`, `repo-pulse`, `repo-article`, `repo-actions`, `repo-scanner`, `project-lens`, `external-feature`, `create-skill`, `autoresearch`, `search-skill`, `auto-workflow`, `deploy-prototype`, `vuln-scanner`, `workflow-security-audit`, `vercel-projects`, `spawn-instance`, `fleet-control`, `fork-fleet` |
-| **Crypto & Markets** (16) | `token-alert`, `token-movers`, `token-report`, `token-pick`, `monitor-runners`, `on-chain-monitor`, `defi-monitor`, `defi-overview`, `market-context-refresh`, `narrative-tracker`, `monitor-polymarket`, `monitor-kalshi`, `polymarket-comments`, `unlock-monitor`, `treasury-info`, `distribute-tokens` |
-| **Social & Writing** (7) | `write-tweet`, `reply-maker`, `remix-tweets`, `refresh-x`, `tweet-roundup`, `agent-buzz`, `farcaster-digest` |
-| **Productivity** (12) | `morning-brief`, `daily-routine`, `evening-recap`, `weekly-review`, `weekly-shiplog`, `goal-tracker`, `idea-capture`, `action-converter`, `tool-builder`, `startup-idea`, `deal-flow`, `reg-monitor` |
-| **Meta / Agent** (11) | `heartbeat`, `reflect`, `self-improve`, `skill-health`, `skill-evals`, `skill-repair`, `skill-leaderboard`, `skill-update-check`, `cost-report`, `rss-feed`, `update-gallery` |
-
-Full descriptions: [`skills.json`](skills.json) — or run `./add-skill aaronjmars/aeon --list`
 
 ---
 
