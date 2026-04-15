@@ -66,33 +66,11 @@ claude setup-token   # opens browser → prints sk-ant-oat01-... (valid 1 year)
 
 ### Bankr Gateway (optional)
 
-Route all Claude Code requests through [Bankr LLM Gateway](https://docs.bankr.bot/llm-gateway/overview) for multi-model access and cost optimization. Bankr routes Claude through Vertex AI (~67% cheaper for Opus) and adds access to Gemini, GPT, Kimi, and Qwen models through a single API.
+Route requests through [Bankr LLM Gateway](https://docs.bankr.bot/llm-gateway/overview) for ~67% cheaper Opus (via Vertex AI) and access to Gemini, GPT, Kimi, and Qwen models.
 
-**Setup:**
-
-1. Get an API key at [bankr.bot/api](https://bankr.bot/api)
-2. Top up credits at [bankr.bot/llm?tab=credits](https://bankr.bot/llm?tab=credits) (USDC, ETH, or BNKR on Base)
-3. Add `BANKR_LLM_KEY` as a repo secret (value: `bk_your_key`)
-4. Set the gateway provider in `aeon.yml`:
-
-```yaml
-gateway:
-  provider: bankr
-```
-
-**Key Permissions:** Your API key must have **LLM Gateway** enabled at [bankr.bot/api](https://bankr.bot/api). The Read Only toggle only affects the Agent API — LLM Gateway access is always available when enabled. A key used only for LLM Gateway doesn't need Agent API enabled. See [Access Control](https://docs.bankr.bot/llm-gateway/overview) for full details.
-
-**Available models (via Bankr):**
-
-| Provider | Models |
-|----------|--------|
-| Anthropic | `claude-opus-4-6`, `claude-sonnet-4-6`, `claude-haiku-4-5-20251001` |
-| Google | `gemini-3-pro`, `gemini-3-flash` |
-| OpenAI | `gpt-5.2` |
-| Moonshot AI | `kimi-k2.5` |
-| Alibaba | `qwen3-coder` |
-
-Non-Claude models are available in the workflow dispatch dropdown and per-skill model overrides when gateway is set to `bankr`. Set `provider: direct` (the default) to use the standard Anthropic API.
+1. Get a key at [bankr.bot/api](https://bankr.bot/api) and top up credits
+2. Add `BANKR_LLM_KEY` as a repo secret
+3. Set `gateway: { provider: bankr }` in `aeon.yml`
 
 ---
 
@@ -100,120 +78,16 @@ Non-Claude models are available in the workflow dispatch dropdown and per-skill 
 
 ![Skills](./assets/skills.jpg)
 
-### Research & Content
-| Skill | Description |
-|-------|-------------|
-| `article` | Research trending topics and write a publication-ready article |
-| `digest` | Generate and send a daily digest on a configurable topic |
-| `rss-digest` | Fetch, summarize, and deliver RSS feed highlights |
-| `hacker-news-digest` | Top HN stories filtered by keywords relevant to your interests |
-| `paper-digest` | Find and summarize new papers matching tracked research interests (via HF Papers API) |
-| `paper-pick` | Find the one paper you should read today (via HF Papers API) |
-| `last30` | Cross-platform 30-day social research — Reddit, X, HN, Polymarket, and the web clustered into one report |
-| `deep-research` | Exhaustive multi-source synthesis on any topic — far beyond a digest |
-| `technical-explainer` | Visual technical explanation of a topic with AI-generated hero image |
-| `list-digest` | Top tweets from tracked X lists in the past 24 hours |
-| `research-brief` | Deep dive on a topic combining web search, papers, and synthesis |
-| `fetch-tweets` | Search X/Twitter for tweets by keyword, username, or both |
-| `reddit-digest` | Fetch and summarize top Reddit posts from tracked subreddits |
-| `telegram-digest` | Digest of recent posts from tracked public Telegram channels |
-| `security-digest` | Monitor recent security advisories from GitHub Advisory DB |
-| `channel-recap` | Weekly recap article from a public Telegram channel |
-| `vibecoding-digest` | Monitor r/vibecoding for trending posts and notable projects |
+| Category | Skills | Highlights |
+|----------|--------|------------|
+| **Research & Content** | 17 | `deep-research`, `digest`, `paper-pick`, `last30`, `hacker-news-digest`, `reddit-digest` |
+| **Dev & Code** | 28 | `pr-review`, `create-skill`, `vuln-scanner`, `auto-merge`, `external-feature`, `deploy-prototype` |
+| **Crypto & Markets** | 16 | `token-alert`, `defi-monitor`, `monitor-polymarket`, `monitor-kalshi`, `narrative-tracker` |
+| **Social & Writing** | 7 | `write-tweet`, `reply-maker`, `remix-tweets`, `agent-buzz`, `farcaster-digest` |
+| **Productivity** | 12 | `morning-brief`, `daily-routine`, `deal-flow`, `goal-tracker`, `action-converter` |
+| **Meta / Agent** | 11 | `heartbeat`, `skill-health`, `skill-repair`, `self-improve`, `cost-report` |
 
-### Dev & Code
-| Skill | Description |
-|-------|-------------|
-| `pr-review` | Auto-review open PRs on watched repos and post summary comments |
-| `github-monitor` | Watch repos for stale PRs, new issues, and new releases |
-| `github-issues` | Check all your repos for new open issues in the last 24 hours |
-| `github-releases` | Track new releases from key AI, crypto, and infra repos |
-| `issue-triage` | Label and prioritize new GitHub issues on watched repos |
-| `auto-merge` | Automatically merge open PRs that have passing CI, no blocking reviews, and no conflicts |
-| `changelog` | Generate a changelog from recent commits across watched repos |
-| `code-health` | Weekly report on TODOs, dead code, and test coverage gaps |
-| `skill-security-scan` | Audit imported skills for shell injection, secret exfiltration, and prompt injection |
-| `github-trending` | Top 10 trending repos on GitHub right now |
-| `push-recap` | Daily deep-dive recap of all pushes — reads diffs, explains what changed and why |
-| `repo-pulse` | Daily report on new stars, forks, and traffic for watched repos |
-| `repo-article` | Write an article about the current state and progress of a watched repo |
-| `repo-actions` | Generate actionable ideas to improve the repo — features, integrations, growth |
-| `repo-scanner` | Catalog all GitHub repos for a user or org |
-| `project-lens` | Write an article through a surprising lens — connecting the project to current events, trends, or philosophy |
-| `external-feature` | Proactively enhance watched repos — fix issues, add features, improve code |
-| `create-skill` | Generate a complete new skill from a one-line prompt |
-| `autoresearch` | Evolve a skill by generating variations, evaluating them, and keeping the best version |
-| `search-skill` | Search the open agent skills ecosystem for useful skills to install |
-| `auto-workflow` | Analyze a URL and generate a tailored `aeon.yml` schedule with skill suggestions |
-| `deploy-prototype` | Generate a small app or tool and deploy it live to Vercel via API |
-| `vuln-scanner` | Audit repos for security vulnerabilities and PR fixes |
-| `workflow-security-audit` | Scan workflows for injection vectors, over-permissioning, and secret exposure |
-| `vercel-projects` | Catalog all Vercel projects with deployment status, domains, and framework info |
-| `spawn-instance` | Clone this Aeon agent into a new repo — fork, configure skills, register in fleet |
-| `fleet-control` | Monitor managed Aeon instances — check health, dispatch skills, aggregate status |
-| `fork-fleet` | Inventory active forks, detect diverged work, surface upstream contribution candidates |
-
-### Crypto / On-chain
-| Skill | Description |
-|-------|-------------|
-| `token-alert` | Notify on price or volume anomalies for tracked tokens |
-| `token-movers` | Top movers, losers, and trending coins from CoinGecko |
-| `token-report` | Daily price performance report for a token — price, volume, liquidity, and context |
-| `token-pick` | One token recommendation and one prediction market pick based on live data |
-| `monitor-runners` | Top 5 tokens that ran hardest in the past 24h across major chains via GeckoTerminal |
-| `on-chain-monitor` | Monitor blockchain addresses and contracts for notable activity |
-| `defi-monitor` | Check pool health, positions, and yield rates for tracked protocols |
-| `defi-overview` | Daily overview of DeFi activity from DeFiLlama — TVL, top chains, top protocols |
-| `market-context-refresh` | Fetch live crypto macro data and update memory |
-| `narrative-tracker` | Track rising, peaking, and fading crypto/tech narratives |
-| `monitor-polymarket` | Monitor specific prediction markets for 24h price moves, volume changes, and comments |
-| `monitor-kalshi` | Monitor Kalshi prediction markets for 24h price moves, volume, and top events |
-| `polymarket-comments` | Top trending Polymarket markets and the most interesting comments |
-| `unlock-monitor` | Weekly token unlock and vesting tracker — flag major supply events before they move markets |
-| `treasury-info` | Wallet holdings overview via Bankr API with block explorer fallback |
-| `distribute-tokens` | Send tokens to contributors via Bankr Agent API (supports Twitter handles and EVM addresses) |
-
-### Social & Writing
-| Skill | Description |
-|-------|-------------|
-| `write-tweet` | Generate 10 tweet drafts across 5 size tiers on a topic from today's outputs |
-| `reply-maker` | Generate two reply options for 5 tweets from tracked accounts or topics |
-| `remix-tweets` | Fetch 10 random past tweets and craft 10 rephrased versions in your voice |
-| `refresh-x` | Fetch a tracked X/Twitter account's latest tweets and save the gist to memory |
-| `tweet-roundup` | Gist of the latest tweets on configurable topics |
-| `agent-buzz` | Top 10 tweets by influence mentioning AI agents |
-| `farcaster-digest` | Trending Farcaster casts filtered by crypto, prediction markets, and coordination |
-
-### Productivity
-| Skill | Description |
-|-------|-------------|
-| `morning-brief` | Aggregated daily briefing — digests, priorities, and what's ahead |
-| `daily-routine` | Morning briefing combining token movers, tweet roundup, paper pick, GitHub issues, and HN digest |
-| `evening-recap` | End-of-day operational summary — what shipped, what failed, what needs follow-up |
-| `weekly-review` | Synthesize the week's logs into a structured retrospective |
-| `weekly-shiplog` | Weekly narrative of everything shipped — features, fixes, and momentum |
-| `goal-tracker` | Compare current progress against goals stored in `MEMORY.md` |
-| `idea-capture` | Quick note capture triggered via Telegram — stores to memory |
-| `action-converter` | 5 concrete real-life actions for today based on recent signals and memory |
-| `tool-builder` | Build automation scripts from action-converter suggestions and recurring tasks |
-| `startup-idea` | 2 startup ideas tailored to your skills, interests, and context |
-| `deal-flow` | Weekly funding round tracker across configurable verticals |
-| `reg-monitor` | Track legislation, regulatory actions, and legal developments affecting prediction markets, crypto, and AI |
-
-### Meta / Agent
-| Skill | Description |
-|-------|-------------|
-| `heartbeat` | Proactive ambient check — surface anything worth attention |
-| `reflect` | Review recent activity, consolidate memory, and prune stale entries |
-| `self-improve` | Improve the agent itself — better skills, prompts, workflows, and config |
-| `skill-health` | Audit skill quality metrics, detect API degradation, and report health trends |
-| `skill-evals` | Evaluate skill output quality against assertion manifests — detect regressions |
-| `skill-repair` | Diagnose and fix failing or degraded skills automatically |
-| `skill-leaderboard` | Weekly ranking of which skills are most popular across active forks |
-| `skill-update-check` | Check imported skills for upstream changes and security regressions |
-| `cost-report` | Weekly API cost report — token usage per skill and model with trends |
-| `rss-feed` | Generate an Atom XML feed from articles in the repo |
-| `update-gallery` | Sync articles, activity logs, and memory to the GitHub Pages site |
+Full catalog with descriptions: [`skills.json`](skills.json) — or run `./add-skill aaronjmars/aeon --list`
 
 ---
 
@@ -250,150 +124,58 @@ Skills that need API keys (CoinGecko, Alchemy, etc.) read from the same environm
 
 ## Use with any AI agent (A2A)
 
-Aeon implements [Google's Agent-to-Agent (A2A) protocol](https://google.github.io/A2A/), making all skills accessible to any A2A-compliant agent framework — LangChain, AutoGen, CrewAI, OpenAI Agents SDK, Vertex AI — without needing Claude or MCP.
+Aeon implements [Google's Agent-to-Agent (A2A) protocol](https://google.github.io/A2A/), so any A2A-compliant framework — LangChain, AutoGen, CrewAI, OpenAI Agents SDK, Vertex AI — can invoke skills without needing Claude or MCP.
 
 ```bash
-./add-a2a
+./add-a2a                    # starts on port 41241
+./add-a2a --port 8080        # custom port
+./add-a2a --print-config     # LangChain/Python client examples
 ```
 
-The gateway starts an HTTP server (default port `41241`) that advertises all Aeon skills via the A2A agent card endpoint and accepts task invocations via JSON-RPC.
-
-**Discovery endpoint** — fetch this to see all available skills:
-
-```
-GET http://localhost:41241/.well-known/agent.json
-```
-
-**Invoke a skill** (Python example with any A2A-compatible HTTP client):
-
-```python
-import requests, uuid
-
-# Send task
-task = requests.post("http://localhost:41241/", json={
-    "jsonrpc": "2.0", "id": 1, "method": "tasks/send",
-    "params": {
-        "id": str(uuid.uuid4()),
-        "skillId": "aeon-deep-research",
-        "var": "AI agent frameworks 2025",
-        "message": {"role": "user", "parts": [{"type": "text", "text": "Run aeon-deep-research"}]}
-    }
-}).json()
-
-task_id = task["result"]["id"]  # poll with tasks/get or use SSE streaming
-```
-
-**SSE streaming** for long-running skills (`deep-research`, `last30`):
-
-```bash
-curl -N -X POST http://localhost:41241/tasks/sendSubscribe \
-  -H "Content-Type: application/json" \
-  -d '{"jsonrpc":"2.0","id":1,"method":"tasks/send","params":{"skillId":"aeon-hacker-news-digest"}}'
-```
-
-**Options:**
-
-| Flag | Effect |
-|------|--------|
-| `./add-a2a` | Build and start on port 41241 |
-| `./add-a2a --port 8080` | Use a custom port |
-| `./add-a2a --build-only` | Build without starting (CI use) |
-| `./add-a2a --print-config` | Print LangChain/Python client examples |
-
-**A2A endpoints:**
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/.well-known/agent.json` | GET | Agent card — lists all skills |
-| `/` | POST | JSON-RPC: `tasks/send`, `tasks/get`, `tasks/cancel` |
-| `/tasks/sendSubscribe` | POST | SSE streaming for async skill output |
-
-Run `./add-a2a --print-config` for ready-to-paste LangChain tool wrappers and Python polling examples.
+Discovery: `GET http://localhost:41241/.well-known/agent.json`
+Invoke: `POST /` with JSON-RPC (`tasks/send`, `tasks/get`, `tasks/cancel`)
+Stream: `POST /tasks/sendSubscribe` for SSE output on long-running skills
 
 ---
 
-## GitHub Pages Gallery
+## Publishing
 
-Aeon publishes articles to a browsable gallery via GitHub Pages. After merging, enable it in **Settings → Pages** → source `Deploy from a branch`, branch `main`, folder `/docs`.
+Aeon publishes articles to a GitHub Pages gallery and an RSS feed.
 
-The gallery will be live at `https://<username>.github.io/aeon`.
+**GitHub Pages:** Enable in **Settings → Pages** → source `Deploy from a branch`, branch `main`, folder `/docs`. The site lives at `https://<username>.github.io/aeon` with articles, activity logs, and memory. The `update-gallery` skill keeps it in sync.
 
-The site includes three sections:
-- **Articles** — published content from content-generating skills
-- **Activity** (`/activity/`) — daily log of everything Aeon does: skills run, files created, notifications sent
-- **Memory** (`/memory/`) — current goals, active topics, and topic deep-dives synced from `memory/`
-
-The `update-gallery` skill syncs `articles/*.md` → `docs/_posts/` with proper Jekyll frontmatter on a weekly schedule. Site data (logs, memory, topics) is synced via `scripts/sync-site-data.sh`. Enable `update-gallery` in `aeon.yml` to keep the gallery up to date automatically.
-
----
-
-## RSS Feed
-
-Subscribe to Aeon's article output via Atom feed:
-
-```
-https://raw.githubusercontent.com/<owner>/<repo>/main/articles/feed.xml
-```
-
-Add this URL to any RSS reader (Feedly, Miniflux, NetNewsWire, etc.) to get new articles as they're published. The feed is regenerated daily or after each content-generating skill runs.
-
----
-
-## Heartbeat
-
-The only skill enabled by default. Runs every 3 hours as a fallback catch-all.
-
-Every run: reads recent memory and logs, checks for stalled PRs (>24h), flagged memory items, urgent issues, and skills that haven't run on schedule. Deduplicates against the last 48h of logs — it won't re-notify you about something it already flagged.
-
-Nothing to report → logs `HEARTBEAT_OK`, exits, no commit. Something needs attention → sends a concise notification.
-
-Heartbeat is listed last in `aeon.yml` so it only runs when no other skill claims the slot.
+**RSS:** Subscribe at `https://raw.githubusercontent.com/<owner>/<repo>/main/articles/feed.xml` — works with any RSS reader. Regenerated after each content skill runs.
 
 ---
 
 ## Quality scoring & self-healing
 
-Every skill output is automatically scored 1–5 by a lightweight model (Haiku) after each run:
+Every skill output is automatically scored 1–5 by Haiku after each run (failed/empty → 1, excellent → 5). Scores and flags (`api_error`, `stale_data`, `rate_limited`) are tracked per skill in `memory/skill-health/` with a rolling 30-run history.
 
-| Score | Meaning |
-|-------|---------|
-| 1 | Failed / empty / error output |
-| 2 | Ran but low quality, generic, or boilerplate |
-| 3 | Acceptable — completed the task adequately |
-| 4 | Good — substantive, well-structured, useful |
-| 5 | Excellent — insightful, well-sourced, actionable |
-
-Scores and flags (e.g. `api_error`, `stale_data`, `rate_limited`) are tracked per skill in `memory/skill-health/<skill>.json` with a rolling 30-run history. The `skill-health` skill reads these files to surface trends and detect degradation.
+**Heartbeat** is the only skill enabled by default. Runs 3x daily, checks `memory/cron-state.json` for failed, stuck, or chronically broken skills, stalled PRs, and missed schedules. Nothing to report → logs `HEARTBEAT_OK`. Something needs attention → sends one notification. Listed last in `aeon.yml` so it only fires when no other skill claims the slot.
 
 ### Self-healing loop
 
-Aeon monitors its own health and can auto-repair failing skills:
-
-1. **`heartbeat`** (3x daily) — checks `memory/cron-state.json` for failed, stuck, or chronically broken skills
-2. **`skill-health`** — audits quality scores and flags API degradation patterns across skills
-3. **`skill-evals`** — runs assertion-based output quality tests to catch regressions
-4. **`skill-repair`** — diagnoses root causes and patches failing skills automatically
-5. **`self-improve`** — evolves prompts, config, and workflows based on recent performance
+1. **`heartbeat`** (3x daily) — detects failed, stuck, or chronically broken skills
+2. **`skill-health`** — audits quality scores and flags API degradation patterns
+3. **`skill-evals`** — assertion-based output quality tests to catch regressions
+4. **`skill-repair`** — diagnoses and patches failing skills automatically
+5. **`self-improve`** — evolves prompts, config, and workflows based on performance
 
 ### Reactive triggers
 
-Skills with `schedule: "reactive"` don't run on a cron — they fire when conditions are met:
+Skills with `schedule: "reactive"` fire on conditions, not cron. If any skill fails 3x in a row, `skill-repair` auto-fires. The scheduler evaluates triggers after processing cron skills.
 
 ```yaml
 reactive:
   skill-repair:
     trigger:
       - { on: "*", when: "consecutive_failures >= 3" }
-  autoresearch:
-    trigger:
-      - { on: skill-health, when: "last_status = success" }
 ```
-
-The scheduler evaluates reactive rules after processing cron skills. Any matching trigger dispatches the skill (with dedup). This means if any skill fails 3 times in a row, `skill-repair` auto-fires to investigate and fix it.
 
 ### Cost tracking
 
-Every run logs token usage (input, output, cache read, cache creation) to `memory/token-usage.csv`. The `cost-report` skill generates a weekly breakdown by skill and model with dollar cost estimates and trend analysis.
+Every run logs token usage to `memory/token-usage.csv`. The `cost-report` skill generates a weekly breakdown by skill and model.
 
 ---
 
@@ -475,26 +257,9 @@ Define chains in `aeon.yml` alongside your skills. The scheduler dispatches them
 
 ### Instance Fleet
 
-Aeon can spawn and manage copies of itself. Use this to run specialized instances — one for crypto monitoring, another for research, etc.
+Aeon can spawn and manage copies of itself via `spawn-instance`, `fleet-control`, and `fork-fleet`. Use this to run specialized instances — one for crypto monitoring, another for research, etc.
 
-| Skill | What it does |
-|-------|-------------|
-| `spawn-instance` | Fork this repo into a new purpose-built instance with pre-selected skills |
-| `fleet-control` | Health checks, skill dispatch, and status reports across all managed instances |
-| `fork-fleet` | Scan community forks for interesting diverged work worth upstreaming |
-
-**Spawning a new instance:**
-```
-var: "crypto-tracker: monitor DeFi protocols and token movements"
-```
-
-The skill forks the repo, selects relevant skills based on the purpose, writes a `SETUP.md` with activation instructions, and registers it in `memory/instances.json`. The new instance is inert until the owner adds their own API keys — no secrets are propagated.
-
-**Fleet control** runs twice daily by default (9am, 3pm UTC). It checks each instance's health, flags stale or degraded instances, and can dispatch skills remotely:
-```
-var: "dispatch crypto-tracker token-movers"
-var: "status"
-```
+Spawn with `var: "crypto-tracker: monitor DeFi protocols and token movements"`. The skill forks the repo, selects relevant skills, and registers it in `memory/instances.json`. No secrets are propagated — the new owner adds their own keys.
 
 ---
 
@@ -549,31 +314,7 @@ Set the secret → channel activates. No code changes needed.
 
 ### Telegram instant mode (optional)
 
-Default polling has up to 5-min delay. Deploy this ~20-line Cloudflare Worker for ~1s response:
-
-```js
-export default {
-  async fetch(request, env) {
-    const { message } = await request.json();
-    if (!message?.text || String(message.chat.id) !== env.TELEGRAM_CHAT_ID)
-      return new Response("ignored");
-
-    // Advance offset so polling doesn't reprocess
-    await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/getUpdates?offset=${message.update_id + 1}`);
-
-    // Trigger GitHub Actions immediately
-    await fetch(`https://api.github.com/repos/${env.GITHUB_REPO}/dispatches`, {
-      method: "POST",
-      headers: { Authorization: `token ${env.GITHUB_TOKEN}`, Accept: "application/vnd.github.v3+json" },
-      body: JSON.stringify({ event_type: "telegram-message", client_payload: { message: message.text } }),
-    });
-
-    return new Response("ok");
-  },
-};
-```
-
-Set env vars (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `GITHUB_REPO`, `GITHUB_TOKEN`) in Cloudflare dashboard, then point your bot's webhook at the worker URL.
+Default polling has up to 5-min delay. Deploy a ~20-line Cloudflare Worker as a webhook for ~1s response time. See [`docs/telegram-instant.md`](docs/telegram-instant.md) for the Worker code and setup.
 
 ---
 
@@ -605,32 +346,20 @@ Skills use `GH_GLOBAL` when available, fall back to `GITHUB_TOKEN` automatically
 
 Installed skills land in `skills/` and are added to `aeon.yml` disabled. Flip `enabled: true` to activate.
 
-### Install individual skills from Aeon
+### Install from Aeon's catalog
 
-Every skill in this repo is independently installable. Browse the full catalog in [`skills.json`](skills.json) or use the CLI:
+Every skill is independently installable. Browse the catalog in [`skills.json`](skills.json) or:
 
 ```bash
-# Install a single skill
-./add-skill aaronjmars/aeon token-alert
-
-# Install multiple skills
-./add-skill aaronjmars/aeon token-alert monitor-polymarket hacker-news-digest
-
-# Install everything
-./add-skill aaronjmars/aeon --all
-
-# Browse available skills
-./add-skill aaronjmars/aeon --list
+./add-skill aaronjmars/aeon --list                                       # browse
+./add-skill aaronjmars/aeon token-alert monitor-polymarket                # install specific
+./add-skill aaronjmars/aeon --all                                         # install everything
 ```
 
-### Export a skill for distribution
-
-Package any skill as a standalone directory (with a generated README) for sharing:
+### Export a skill
 
 ```bash
 ./export-skill token-alert              # exports to ./exports/token-alert/
-./export-skill token-alert --tar        # also creates a .tar.gz archive
-./export-skill --list                   # list all exportable skills
 ```
 
 ### Trigger feature builds from issues
