@@ -133,16 +133,6 @@ Spawn with `var: "crypto-tracker: monitor DeFi protocols and token movements"`. 
 
 ---
 
-## Publishing
-
-Aeon publishes articles to a GitHub Pages gallery and an RSS feed.
-
-**GitHub Pages:** Enable in **Settings → Pages** → source `Deploy from a branch`, branch `main`, folder `/docs`. The site lives at `https://<username>.github.io/aeon` with articles, activity logs, and memory. The `update-gallery` skill keeps it in sync.
-
-**RSS:** Subscribe at `https://raw.githubusercontent.com/<owner>/<repo>/main/articles/feed.xml` — works with any RSS reader. Regenerated after each content skill runs.
-
----
-
 ## Quality scoring & self-healing
 
 Every skill output is automatically scored 1–5 by Haiku after each run (failed/empty → 1, excellent → 5). Scores and flags (`api_error`, `stale_data`, `rate_limited`) are tracked per skill in `memory/skill-health/` with a rolling 30-run history.
@@ -267,6 +257,55 @@ Claude only installs and runs when a skill actually matches.
 
 ---
 
+## Project structure
+
+![The Stack](./assets/stack.jpg)
+
+```
+CLAUDE.md                ← agent identity (auto-loaded by Claude Code)
+aeon.yml                 ← skill schedules, chains, reactive triggers, and enabled flags
+skills.json              ← machine-readable skill catalog (91 skills)
+./aeon                   ← launch the local dashboard (Next.js on port 5555)
+./notify                 ← multi-channel notifications (Telegram, Discord, Slack, Email, json-render)
+./notify-jsonrender      ← convert skill output to dashboard feed cards via Haiku
+./add-skill              ← import skills from GitHub repos (with security scanning)
+./add-mcp                ← register Aeon as an MCP server for Claude Desktop/Code
+./add-a2a                ← start the A2A protocol gateway for external agents
+./export-skill           ← package skills for standalone distribution
+./generate-skills-json   ← regenerate skills.json from SKILL.md files
+docs/                    ← GitHub Pages site (articles, activity log, memory)
+soul/                    ← optional identity files (SOUL.md, STYLE.md, examples/, data/)
+skills/                  ← each skill is a SKILL.md prompt file
+  article/
+  digest/
+  heartbeat/
+  ...                    ← 91 skills total
+workflows/               ← GitHub Agentic Workflow templates (.md)
+mcp-server/              ← MCP server — exposes skills as Claude tools
+a2a-server/              ← A2A protocol gateway — exposes skills to any agent framework
+dashboard/               ← local web UI (Next.js + json-render feed)
+memory/
+  MEMORY.md              ← goals, active topics, pointers
+  cron-state.json        ← per-skill execution metrics (status, success rate, quality)
+  skill-health/          ← rolling quality scores per skill (last 30 runs)
+  token-usage.csv        ← token cost tracking per run
+  issues/                ← structured issue tracker for skill failures
+  topics/                ← detailed notes by topic
+  logs/                  ← daily activity logs (YYYY-MM-DD.md)
+.outputs/                ← skill chain outputs (passed between chained steps)
+scripts/
+  prefetch-xai.sh        ← pre-fetch X/Grok API data outside sandbox
+  postprocess-replicate.sh ← generate images via Replicate after Claude runs
+  skill-runs             ← audit recent GitHub Actions skill runs
+  sync-site-data.sh      ← sync memory/logs to docs site data
+.github/workflows/
+  aeon.yml               ← skill runner (workflow_dispatch, issues, quality scoring)
+  chain-runner.yml       ← skill chain executor (parallel + sequential pipelines)
+  messages.yml           ← cron scheduler + message polling (Telegram/Discord/Slack)
+```
+
+---
+
 ## GitHub Actions cost
 
 | Scenario | Cost |
@@ -357,52 +396,13 @@ Label any GitHub issue `ai-build` → workflow fires → Claude reads the issue,
 
 ---
 
-## Project structure
+## Publishing
 
-![The Stack](./assets/stack.jpg)
+Aeon publishes articles to a GitHub Pages gallery and an RSS feed.
 
-```
-CLAUDE.md                ← agent identity (auto-loaded by Claude Code)
-aeon.yml                 ← skill schedules, chains, reactive triggers, and enabled flags
-skills.json              ← machine-readable skill catalog (91 skills)
-./aeon                   ← launch the local dashboard (Next.js on port 5555)
-./notify                 ← multi-channel notifications (Telegram, Discord, Slack, Email, json-render)
-./notify-jsonrender      ← convert skill output to dashboard feed cards via Haiku
-./add-skill              ← import skills from GitHub repos (with security scanning)
-./add-mcp                ← register Aeon as an MCP server for Claude Desktop/Code
-./add-a2a                ← start the A2A protocol gateway for external agents
-./export-skill           ← package skills for standalone distribution
-./generate-skills-json   ← regenerate skills.json from SKILL.md files
-docs/                    ← GitHub Pages site (articles, activity log, memory)
-soul/                    ← optional identity files (SOUL.md, STYLE.md, examples/, data/)
-skills/                  ← each skill is a SKILL.md prompt file
-  article/
-  digest/
-  heartbeat/
-  ...                    ← 91 skills total
-workflows/               ← GitHub Agentic Workflow templates (.md)
-mcp-server/              ← MCP server — exposes skills as Claude tools
-a2a-server/              ← A2A protocol gateway — exposes skills to any agent framework
-dashboard/               ← local web UI (Next.js + json-render feed)
-memory/
-  MEMORY.md              ← goals, active topics, pointers
-  cron-state.json        ← per-skill execution metrics (status, success rate, quality)
-  skill-health/          ← rolling quality scores per skill (last 30 runs)
-  token-usage.csv        ← token cost tracking per run
-  issues/                ← structured issue tracker for skill failures
-  topics/                ← detailed notes by topic
-  logs/                  ← daily activity logs (YYYY-MM-DD.md)
-.outputs/                ← skill chain outputs (passed between chained steps)
-scripts/
-  prefetch-xai.sh        ← pre-fetch X/Grok API data outside sandbox
-  postprocess-replicate.sh ← generate images via Replicate after Claude runs
-  skill-runs             ← audit recent GitHub Actions skill runs
-  sync-site-data.sh      ← sync memory/logs to docs site data
-.github/workflows/
-  aeon.yml               ← skill runner (workflow_dispatch, issues, quality scoring)
-  chain-runner.yml       ← skill chain executor (parallel + sequential pipelines)
-  messages.yml           ← cron scheduler + message polling (Telegram/Discord/Slack)
-```
+**GitHub Pages:** Enable in **Settings → Pages** → source `Deploy from a branch`, branch `main`, folder `/docs`. The site lives at `https://<username>.github.io/aeon` with articles, activity logs, and memory. The `update-gallery` skill keeps it in sync.
+
+**RSS:** Subscribe at `https://raw.githubusercontent.com/<owner>/<repo>/main/articles/feed.xml` — works with any RSS reader. Regenerated after each content skill runs.
 
 ---
 
