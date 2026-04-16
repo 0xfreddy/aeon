@@ -95,6 +95,9 @@ skills:
   # --- Gallery update (Sunday 6 PM UTC, after content week) ---
   update-gallery: { enabled: false, schedule: "0 18 * * 0" }
 
+  # --- Content distribution (runs 30 min after article-generating skills) ---
+  syndicate-article: { enabled: false, schedule: "30 15 * * *", model: "claude-sonnet-4-6", var: "" } # cross-post latest article to Dev.to
+
   # --- Evening / meta (6 PM UTC) ---
   goal-tracker: { enabled: false, schedule: "0 18 * * *" }
   skill-health: { enabled: false, schedule: "0 18 * * *" }
