@@ -1,6 +1,6 @@
 ---
 name: macOS App Discovery
-description: Weekly digest of the best new macOS applications from Reddit, Product Hunt, and Twitter/X
+description: Weekly digest of the best new macOS applications from Reddit and Twitter/X
 var: ""
 tags: [news, digest]
 ---
@@ -8,7 +8,7 @@ tags: [news, digest]
 
 ## Overview
 
-Collect the top macOS app discoveries from Reddit, Product Hunt, and Twitter/X over the past 7 days, deduplicate against a persistent index, score each candidate, and produce a structured markdown digest.
+Collect the top macOS app discoveries from Reddit and Twitter/X over the past 7 days, deduplicate against a persistent index, score each candidate, and produce a structured markdown digest.
 
 ## Config
 
@@ -21,10 +21,6 @@ reddit:
   min_score: 50
   user_agent: "macfolio/1.0 (by u/macfolio-bot)"
 
-product_hunt:
-  topics: [Mac, Productivity, Developer Tools, Design Tools, Writing, Utilities]
-  min_votes: 10
-
 twitter:
   query: '(macOS app OR mac app OR "new mac app" OR #macapps OR #MacApps) -is:retweet lang:en'
   max_results: 100
@@ -32,9 +28,8 @@ twitter:
   min_retweets: 10
 
 scoring:
-  reddit_weight: 0.4
-  ph_weight: 1.0
-  twitter_weight: 0.3
+  reddit_weight: 0.6
+  twitter_weight: 0.4
 
 output:
   top_n: 10
@@ -70,26 +65,7 @@ curl -s -H "Authorization: Bearer ${TOKEN}" \
 
 If Reddit auth fails, use WebFetch as fallback to scrape `https://www.reddit.com/r/macapps/top/?t=week`.
 
-## Step 2 — Collect from Product Hunt
-
-```bash
-curl -s -X POST https://api.producthunt.com/v2/api/graphql \
-  -H "Authorization: Bearer ${PRODUCT_HUNT_TOKEN}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "{ posts(order: VOTES, postedAfter: \"SEVEN_DAYS_AGO_ISO\", topic: \"mac\") { edges { node { name tagline votesCount website createdAt topics { edges { node { name } } } } } } }"
-  }'
-```
-
-Replace `SEVEN_DAYS_AGO_ISO` with the actual ISO date 7 days ago.
-
-**Filtering:** Only keep posts tagged Mac, Productivity, Developer Tools, Design Tools, Writing, or Utilities. Drop posts with votesCount < 10.
-
-**Extract:** name, tagline, votesCount, website, createdAt
-
-If `PRODUCT_HUNT_TOKEN` is not set, skip this source.
-
-## Step 3 — Collect from Twitter/X
+## Step 2 — Collect from Twitter/X
 
 ```bash
 curl -s -H "Authorization: Bearer ${TWITTER_BEARER_TOKEN}" \
@@ -104,7 +80,7 @@ curl -s -H "Authorization: Bearer ${TWITTER_BEARER_TOKEN}" \
 
 If `TWITTER_BEARER_TOKEN` is not set, skip this source.
 
-## Step 4 — Deduplicate
+## Step 3 — Deduplicate
 
 For each candidate app:
 1. Normalize name: lowercase, strip whitespace, remove ".app" suffix
@@ -112,21 +88,21 @@ For each candidate app:
 3. If found, exclude from this run
 4. If not found, mark as new discovery
 
-## Step 5 — Score and rank
+## Step 4 — Score and rank
 
 For each non-deduplicated app:
 
 ```
-signal_score = (reddit_upvotes × 0.4) + (ph_votes × 1.0) + (twitter_likes × 0.3)
+signal_score = (reddit_upvotes × 0.6) + (twitter_likes × 0.4)
 ```
 
 If an app appears on multiple sources, sum all scores. Sort descending, take top 10.
 
-## Step 6 — Categorize
+## Step 5 — Categorize
 
 Assign each app to one of: Productivity, Developer Tools, Design, Utilities, Writing, Media, Finance, Other.
 
-## Step 7 — Generate digest
+## Step 6 — Generate digest
 
 Create `articles/macos-apps-YYYY-MM-DD.md` with today's date:
 
@@ -144,7 +120,7 @@ app_count: N
 ### App Name
 One to two sentence description.
 
-- **Source:** Reddit r/macapps (150 upvotes) | Product Hunt (45 votes)
+- **Source:** Reddit r/macapps (150 upvotes) | Twitter (45 likes)
 - **Price:** Free / Freemium / Paid / Open Source
 - **Website:** [domain.com](https://domain.com)
 - **Signal Score:** 105.0
@@ -152,7 +128,7 @@ One to two sentence description.
 
 Group by category, sort by signal_score within each category.
 
-## Step 8 — Update dedup index
+## Step 7 — Update dedup index
 
 Append all newly discovered apps to `memory/macos-apps-index.json`:
 
@@ -163,7 +139,7 @@ Append all newly discovered apps to `memory/macos-apps-index.json`:
 }
 ```
 
-## Step 9 — Notify
+## Step 8 — Notify
 
 Use the `./notify` command to announce the digest:
 
