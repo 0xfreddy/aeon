@@ -1,0 +1,57 @@
+# macOS App Discovery Engine — Configuration
+# Credentials are injected via GitHub Actions Secrets, never stored here.
+
+reddit:
+  subreddits:
+    - macapps
+    - MacOS
+    - productivity
+  keywords:
+    - app
+    - tool
+    - utility
+    - workflow
+    - release
+    - launch
+    - macOS
+    - open source
+    - free app
+    - paid app
+    - menubar
+    - menu bar
+    - indie
+  min_score: 50
+  user_agent: "macfolio/1.0 (by u/macfolio-bot)"
+
+product_hunt:
+  topics:
+    - Mac
+    - Productivity
+    - Developer Tools
+    - Design Tools
+    - Writing
+    - Utilities
+  min_votes: 10
+
+twitter:
+  query: "(macOS app OR mac app OR \"new mac app\" OR #macapps OR #MacApps) -is:retweet lang:en"
+  max_results: 100
+  min_likes: 20
+  min_retweets: 10
+
+scoring:
+  reddit_weight: 0.4
+  ph_weight: 1.0
+  twitter_weight: 0.3
+
+output:
+  top_n: 10
+  categories:
+    - Productivity
+    - Developer Tools
+    - Design
+    - Utilities
+    - Writing
+    - Media
+    - Finance
+    - Other
