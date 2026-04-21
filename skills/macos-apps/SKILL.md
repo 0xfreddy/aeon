@@ -123,10 +123,32 @@ One to two sentence description.
 - **Source:** Reddit r/macapps (150 upvotes) | Twitter (45 likes)
 - **Price:** Free / Freemium / Paid / Open Source
 - **Website:** [domain.com](https://domain.com)
+- **Icon:** https://icon-url.com/icon.png
+- **Screenshots:** https://url1.com/s1.jpg | https://url2.com/s2.jpg | https://url3.com/s3.jpg
 - **Signal Score:** 105.0
 ```
 
+The `Icon` and `Screenshots` fields are new. Screenshots are pipe-separated URLs. Omit these lines if no images were found.
+
 Group by category, sort by signal_score within each category.
+
+## Step 6b — Enrich with icons and screenshots
+
+For each app in the final list, fetch an icon and up to 3 product screenshots before writing the digest.
+
+**Strategy 1 — iTunes Search API (free, no auth):**
+
+```bash
+curl -s "https://itunes.apple.com/search?term=APP_NAME&entity=macSoftware&country=us&limit=3"
+```
+
+If a match is found, use `artworkUrl512` for the icon and the first 3 entries of `screenshotUrls` for screenshots.
+
+**Strategy 2 — Website og:image (for apps not on the App Store):**
+
+Use WebFetch on the app's website and extract the `og:image` meta tag as the icon. Look for product hero or screenshot images on the landing page for screenshots.
+
+If neither yields results, omit the Icon and Screenshots lines for that app.
 
 ## Step 7 — Update dedup index
 
