@@ -136,42 +136,71 @@ Group by category, sort by signal_score within each category.
 
 For each app in the final list, fetch an icon and up to 3 product screenshots before writing the digest. Try each strategy in order and stop at the first one that yields a valid square-ish icon (not a wide banner).
 
+### 6b-i — Resolve GitHub Pages URLs to repos
+
+Before icon lookup, normalize any GitHub Pages URL to its source repo:
+
+- Pattern: `USERNAME.github.io/REPONAME` → `github.com/USERNAME/REPONAME`
+- Example: `wouter01.github.io/MediaMate` → repo is `github.com/wouter01/MediaMate`
+
+Apply this before Strategy 2 so GitHub Pages apps get the full repo asset lookup.
+
+### 6b-ii — URL verification pass
+
+Before writing the digest, verify every app's website URL:
+
+1. WebFetch the `websiteUrl`
+2. Check that the page content mentions the app name (case-insensitive partial match)
+3. If **not found** or URL fails to load: mark as unverified
+   - Write website line as: `[domain.com](https://domain.com) ⚠️ unverified`
+   - Append to `memory/macos-apps-flagged.json`:
+     ```json
+     { "name": "AppName", "date": "YYYY-MM-DD", "candidateUrl": "https://...", "reason": "page did not mention app name" }
+     ```
+4. Read existing `memory/macos-apps-flagged.json` first (default `[]`) and append; do not overwrite.
+
+### 6b-iii — Icon strategies
+
 **Strategy 1 — iTunes Search API (preferred, free, no auth):**
 
 ```bash
 curl -s "https://itunes.apple.com/search?term=APP_NAME&entity=macSoftware&country=us&limit=3"
 ```
 
-If a matching result is found (verify app name is close to the search term):
-- Icon: use `artworkUrl512` — always a proper square app icon
-- Screenshots: first 3 entries from `screenshotUrls`
+If a match is found: icon = `artworkUrl512`, screenshots = first 3 `screenshotUrls`.
 
-**Strategy 2 — GitHub repo icon (for open-source apps):**
+**Strategy 2 — GitHub repo icon (open-source apps):**
 
-If the app's website or source points to a GitHub repo (github.com/owner/repo), or if you can infer it from the app name, check the repo file tree for app icon assets:
+If the website resolves to a GitHub repo (direct or via Pages mapping in 6b-i):
 
 ```bash
-curl -s "https://api.github.com/repos/OWNER/REPO/contents/assets" 2>/dev/null
-curl -s "https://api.github.com/repos/OWNER/REPO/contents/Resources" 2>/dev/null
+curl -s "https://api.github.com/repos/OWNER/REPO/contents"
+curl -s "https://api.github.com/repos/OWNER/REPO/contents/assets"
+curl -s "https://api.github.com/repos/OWNER/REPO/contents/Resources"
 ```
 
-Look for files named `icon.png`, `AppIcon.png`, `app-icon.png`, `logo.png`, or any `.png` in `assets/`, `Resources/`, `src/assets/`, or the repo root. Use the `download_url` field as the icon URL.
+Look for `icon.png`, `AppIcon.png`, `app-icon.png`, `logo.png`. Use `download_url`.
 
-This is especially important for open-source apps like Cap, Warp, Zed, HandBrake, KeePassXC, IINA, etc.
+For **Xcode projects**: if the above are empty, search for `.xcassets` directories:
 
-**Strategy 3 — apple-touch-icon scraping (for other non-App Store apps):**
+```bash
+curl -s "https://api.github.com/repos/OWNER/REPO/contents" | grep -i "xcassets\|AppIcon"
+```
 
-Use WebFetch on the app's website and look for icon candidates in this priority order:
+Fetch the `AppIcon.appiconset` contents and use the largest `.png` (`download_url`).
 
-1. `<link rel="apple-touch-icon" href="...">` — designed to be square, app-like
-2. `<link rel="apple-touch-icon-precomposed" href="...">`
-3. `<link rel="icon" sizes="512x512">` or `sizes="256x256"`
-4. Try well-known paths: `/apple-touch-icon.png`, `/apple-touch-icon-precomposed.png`, `/icon-512.png`, `/icon.png`
-5. `<meta property="og:image">` **only** if the URL path suggests an icon (contains "icon", "logo", "app-icon"). Skip if it looks like a banner ("banner", "hero", "og", "social", "open-graph").
+**Strategy 3 — apple-touch-icon scraping:**
 
-For screenshots: look for `<img>` tags with src containing "screenshot", "screen", "preview", or "feature".
+WebFetch the app website, look in this order:
 
-If no strategy yields a valid icon, omit the `Icon:` line. Never use a wide banner image as an app icon.
+1. `<link rel="apple-touch-icon">` / `apple-touch-icon-precomposed`
+2. `<link rel="icon" sizes="512x512">` or `sizes="256x256"`
+3. Well-known paths: `/apple-touch-icon.png`, `/icon-512.png`, `/icon.png`
+4. `og:image` only if URL path contains "icon" / "logo" / "app-icon" — skip if it contains "banner", "hero", "og", "social", "open-graph"
+
+For screenshots: `<img>` tags with src containing "screenshot", "screen", "preview", "feature".
+
+Omit `Icon:` line if nothing found. Never use a wide banner image as an app icon.
 
 ## Step 7 — Update dedup index
 
